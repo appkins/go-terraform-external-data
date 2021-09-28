@@ -2,16 +2,11 @@ package terraform
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"os"
 )
 
 type QueryData map[string]string
-
-func getBytes() ([]byte, error) {
-	return io.ReadAll(os.Stdin)
-}
 
 func check(e error) {
 	if e != nil {
@@ -44,7 +39,7 @@ func writeResponse(res interface{}) (err error) {
 func ExternalDataRaw(fn func(QueryData) (bytes []byte, e error)) (err error) {
 	input, err := getQueryData()
 	check(err)
-	if res, err := fn(input); err != nil {
+	if res, err := fn(input); err == nil {
 		return writeResponseRaw(res)
 	}
 	return err
@@ -53,7 +48,7 @@ func ExternalDataRaw(fn func(QueryData) (bytes []byte, e error)) (err error) {
 func ExternalData(fn func(QueryData) (r interface{}, e error)) (err error) {
 	input, err := getQueryData()
 	check(err)
-	if res, err := fn(input); err != nil {
+	if res, err := fn(input); err == nil {
 		return writeResponse(res)
 	}
 	return err
