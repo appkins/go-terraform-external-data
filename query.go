@@ -26,9 +26,27 @@ func getQueryData() (d QueryData, e error) {
 	return d, e
 }
 
+func writeResponseRaw(res []byte) (err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = os.Stdout.Write(res)
+	check(err)
+	return err
+}
+
 func writeResponse(res interface{}) (err error) {
 	err = json.NewEncoder(os.Stdout).Encode(&res)
 	check(err)
+	return err
+}
+
+func ExternalDataRaw(fn func(QueryData) (bytes []byte, e error)) (err error) {
+	input, err := getQueryData()
+	check(err)
+	if res, err := fn(input); err != nil {
+		return writeResponseRaw(res)
+	}
 	return err
 }
 
